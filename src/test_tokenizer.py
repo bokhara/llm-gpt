@@ -6,13 +6,14 @@ from simple_tokenizer_v1 import SimpleTokenizerV1
 
 def build_vocab_from_corpus(path: Path):
     raw_text = path.read_text(encoding="utf-8")
-    tokens = re.split(r'([,.?_!"()\']|--|\s)', raw_text)
+    tokens = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
     tokens = [t.strip() for t in tokens if t.strip()]
 
-    vocab = {}
-    for t in tokens:
-        if t not in vocab:
-            vocab[t] = len(vocab)
+    # New vocab: include two special tokens at the end
+    all_tokens = sorted(list(set(tokens)))
+    all_tokens.extend(["<|endoftext|>", "<|unk|>"])
+
+    vocab = {token: integer for integer, token in enumerate(all_tokens)}
     return vocab
 
 

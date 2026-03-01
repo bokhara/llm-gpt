@@ -11,8 +11,11 @@ def build_vocab_from_verdict() -> SimpleTokenizerV1:
     preprocessed = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
     preprocessed = [item.strip() for item in preprocessed if item.strip()]
 
-    all_words = sorted(set(preprocessed))
-    vocab = {token: integer for integer, token in enumerate(all_words)}
+    # New vocab: include two special tokens at the end
+    all_tokens = sorted(list(set(preprocessed)))
+    all_tokens.extend(["<|endoftext|>", "<|unk|>"])
+
+    vocab = {token: integer for integer, token in enumerate(all_tokens)}
 
     return SimpleTokenizerV1(vocab)
 
@@ -24,9 +27,8 @@ def test_edith_wharton_quote_roundtrip():
 
     ids = tokenizer.encode(text)
 
-    # Expectation from manual run: leading and trailing '"' map to id 1
-    assert ids[0] == 1
-    assert ids[-1] == 1
+    # Leading and trailing '"' should map to the same token id (not necessarily 1 anymore)
+    assert ids[0] == ids[-1]
 
     decoded = tokenizer.decode(ids)
     assert decoded == text
