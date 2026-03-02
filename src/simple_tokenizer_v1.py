@@ -31,7 +31,7 @@ class SimpleTokenizerV1:
     def decode(self, ids: List[int]) -> str:
         """Decode a list of token ids back into a text string.
 
-        Joins tokens with spaces, then removes extra spaces before punctuation.
+        Joins tokens with spaces, then fixes spacing around punctuation and quotes.
         """
         tokens: List[str] = []
         for i in ids:
@@ -40,7 +40,12 @@ class SimpleTokenizerV1:
             tokens.append(self.int_to_str[i])
 
         text = " ".join(tokens)
-        text = re.sub(r"\s+([,.?\!\"()\'])", r"\1", text)
+        # Remove spaces before punctuation (commas, periods, etc.)
+        text = re.sub(r"\s+([,.?\!\"()'])", r"\1", text)
+        # Remove space after opening quote, e.g. " It -> "It
+        text = re.sub(r"\"\s+(\w)", r"\1", text)
+        # Collapse patterns like It' s -> It's (generic letter' letter)
+        text = re.sub(r"(\w)'\s+(\w)", r"\1'\2", text)
         return text
 
 
