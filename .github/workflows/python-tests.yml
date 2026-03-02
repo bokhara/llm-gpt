@@ -23,6 +23,9 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest tiktoken
+          # CPU 版 PyTorch + 依赖
+          pip install "numpy<2.0"  # 一些 torch 版本对 numpy 2 兼容性不佳
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
 
       - name: Run tests
         run: |
